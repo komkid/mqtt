@@ -27,8 +27,6 @@
             useSSL: useTLS,
             cleanSession: cleansession,
             onSuccess: onConnect,
-            userName: 'myu',
-            password: 'myp',
             onFailure: function (message) {
                 $('#status').val("Connection failed: " + message.errorMessage + "Retrying");
                 setTimeout(MQTTconnect, reconnectTimeout);
