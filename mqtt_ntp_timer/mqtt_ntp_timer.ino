@@ -45,7 +45,7 @@ unsigned int s;
 
 const char* ssid = "...";
 const char* password = "...";
-const char* mqtt_server = "192.168.2.4";
+const char* mqtt_server = "...";
 #define LEDPIN LED_BUILTIN
 
 WiFiClient espClient;
@@ -115,22 +115,23 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  payload[length] = '\0';
+  String strPayload = String((char*)payload);
+  String strTopic = String((char*)topic);
+
   printTimeNow();
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-/*
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-*/  
-  payload[length] = '\0';
-  String strPayload = String((char*)payload);
+
   Serial.print(strPayload);
   Serial.println();
 
+  if(strTopic == "Auto/Manual"){
+      Serial.print("Mode changed!");
+  } 
   // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
+  if (strPayload == '1') {
     digitalWrite(LEDPIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
     // but actually the LED is on; this is because
     // it is acive low on the ESP-01)
@@ -149,7 +150,7 @@ void reconnect() {
       // Once connected, publish an announcement...
       client.publish("outTopic", "hello world");
       // ... and resubscribe
-      client.subscribe("inTopic");
+      client.subscribe("#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -165,16 +166,17 @@ void mqtt_job(){
     reconnect();
   }
   client.loop();
-
+/*
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
-    //++value;
-    //snprintf (msg, 75, "hello world #%ld", value);
-    //Serial.print("Publish message: ");
-    //Serial.println(msg);
-    //client.publish("outTopic", msg);
+    ++value;
+    snprintf (msg, 75, "hello world #%ld", value);
+    Serial.print("Publish message: ");
+    Serial.println(msg);
+    client.publish("outTopic", msg);
   }  
+*/  
 }
 
 void loop() {
@@ -216,4 +218,3 @@ void printTimeNow(){
   Serial.print(s); // print the second
   Serial.print(" >> "); // print the second
 }
-
