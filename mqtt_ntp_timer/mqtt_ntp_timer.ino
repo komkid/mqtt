@@ -20,7 +20,10 @@ unsigned int s;
 const char* ssid = "...";
 const char* password = "...";
 const char* mqtt_server = "...";
+
 #define LEDPIN LED_BUILTIN
+#define RELAYPIN LED_BUILTIN
+int workingMode = 1; // 1 = Auto, 0 = Manual
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -35,8 +38,25 @@ void blinking(int qty=5){
   }
 }
 
+void updateIO(int state) {
+  if (state == 1) {
+    digitalWrite(RELAYPIN, HIGH);
+    #ifdef LEDPIN
+      digitalWrite(LEDPIN, LOW);
+    #endif
+  }
+  else {
+    state = 0;
+    digitalWrite(RELAYPIN, LOW);
+    #ifdef LEDPIN
+      digitalWrite(LEDPIN, HIGH);
+    #endif
+  }
+}
+
 void setup() {
   pinMode(LEDPIN, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  pinMode(RELAYPIN, OUTPUT);     
   Serial.begin(115200);
 
   setup_wifi();
@@ -45,7 +65,7 @@ void setup() {
   client.setCallback(callback);
   mqttEvent = t.every(1000, mqtt_job);  
 
-  configTime(timezone, dst, "pool.ntp.org", "time.nist.gov");     //ดึงเวลาจาก Server
+  configTime(timezone, dst, "th.pool.ntp.org", "192.168.0.2");     //ดึงเวลาจาก Server
   Serial.println("\nWaiting for time");
   while (!time(nullptr)) {
     Serial.print(".");
@@ -62,7 +82,7 @@ void setup() {
 
   printTimeNow();
   Serial.println("Now");
-  blinking(20);
+  blinking(5);
 }
 
 void setup_wifi() {
@@ -98,17 +118,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(strPayload);
   Serial.println();
 
-  if(strTopic == "Auto/Manual"){
-      Serial.print("Mode changed!");
+  if(strTopic == "Auto/Manual"){ //1 Auto , 0 = Manual
+    if(strPayload == "1"){
+      Serial.print("Mode : Auto");
+      workingMode = 1;
+    } else {
+      Serial.print("Mode : Manual");
+      workingMode = 0;
+    }
   } 
-  // Switch on the LED if an 1 was received as first character
-  if (strPayload == "1") {
-    digitalWrite(LEDPIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is acive low on the ESP-01)
-  } else {
-    digitalWrite(LEDPIN, HIGH);  // Turn the LED off by making the voltage HIGH
-  }
 }
 
 void reconnect() {
@@ -119,9 +137,9 @@ void reconnect() {
     if (client.connect("ESP8266Client")) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("outTopic", "hello world");
+      //client.publish("outTopic", "hello world");
       // ... and resubscribe
-      client.subscribe("#");
+      client.subscribe("Auto/Manual");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -154,7 +172,18 @@ void tikTok(){
       if(h == 24) h = 0;
     }
   }
-  //printTimeNow();
+  
+  printTimeNow();
+  if(workingMode == 1){//Auto
+    if((m%2) == 0){
+      Serial.print("ON");
+      updateIO(1);
+    } else {
+      Serial.print("OFF");
+      updateIO(0); 
+    }
+  }
+
   if(h == 0 & m == 0){
     delay(60000);
     ESP.restart();
