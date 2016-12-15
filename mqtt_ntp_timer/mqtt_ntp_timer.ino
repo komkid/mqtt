@@ -126,6 +126,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
       Serial.print("Mode : Manual");
       workingMode = 0;
     }
+  } else if(strTopic == "On/Off") { 
+    if(strPayload == "1"){
+      Serial.print("Manual : ON");
+      updateIO(1);
+    } else {
+      Serial.print("Manual : OFF");
+      updateIO(0);
+    }
   } 
 }
 
@@ -140,6 +148,7 @@ void reconnect() {
       //client.publish("outTopic", "hello world");
       // ... and resubscribe
       client.subscribe("Auto/Manual");
+      client.subscribe("On/Off");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -176,10 +185,10 @@ void tikTok(){
   printTimeNow();
   if(workingMode == 1){//Auto
     if((m%2) == 0){
-      Serial.print("ON");
+      Serial.print("Auto : ON");
       updateIO(1);
     } else {
-      Serial.print("OFF");
+      Serial.print("Auto : OFF");
       updateIO(0); 
     }
   }
