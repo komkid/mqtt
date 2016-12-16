@@ -10,7 +10,7 @@ int inputEvent;
 int timeEvent;
 int mqttEvent;
 
-int updateInterval = 5000;//millisec.
+int updateInterval = 1000;//millisec.
 unsigned int h;
 unsigned int m;
 unsigned int s;
@@ -22,32 +22,14 @@ const char* ssid = "...";
 const char* password = "...";
 const char* mqtt_server = "...";
 
-#define LEDPIN LED_BUILTIN
-#define RELAYPIN LED_BUILTIN
+#define LEDPIN 13
+#define RELAYPIN 12
 #define BUTTONPIN 0     // the number of the pushbutton pin
 int state = 0;
 int workingMode = 1; // 1 = Auto, 0 = Manual
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-
-void readInput()
-{
-  // read the state of the pushbutton value:
-  buttonState = digitalRead(BUTTONPIN);
-
-  // check if the pushbutton is pressed.
-  // if it is, the buttonState is HIGH:
-  if (buttonState == LOW) {
-    printTimeNow();
-    state = (state == 0) ? 1 : 0;
-    Serial.print("Button pressed, now = ");
-    Serial.print(state);
-    updateIO(state);
-    client.publish("On/Off", state);
-//    delay(1000);
-  }
-}
 
 void blinking(int qty=5){
   int n;
@@ -238,4 +220,26 @@ void printTimeNow(){
   }
   Serial.print(s); // print the second
   Serial.print(" >> "); // print the second
+}
+
+void readInput()
+{
+  // read the state of the pushbutton value:
+  int buttonState = digitalRead(BUTTONPIN);
+
+  // check if the pushbutton is pressed.
+  // if it is, the buttonState is HIGH:
+  if (buttonState == LOW) {
+    printTimeNow();
+    state = (state == 0) ? 1 : 0;
+    Serial.print("Button : ");
+    Serial.print(state);
+    updateIO(state);
+    String tmpString = String(state);
+    char pubString[2];
+    tmpString.toCharArray(pubString, tmpString.length() + 1); //packaging up the data to publish to mqtt whoa...
+    
+    client.publish("On/Off", pubString);
+//    delay(1000);
+  }
 }
