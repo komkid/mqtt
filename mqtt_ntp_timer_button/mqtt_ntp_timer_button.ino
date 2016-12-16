@@ -40,9 +40,11 @@ void readInput()
   // if it is, the buttonState is HIGH:
   if (buttonState == LOW) {
     printTimeNow();
-    Serial.println("Button pressed");
     state = (state == 0) ? 1 : 0;
+    Serial.print("Button pressed, now = ");
+    Serial.print(state);
     updateIO(state);
+    client.publish("On/Off", state);
 //    delay(1000);
   }
 }
