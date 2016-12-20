@@ -140,7 +140,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("SONOFF-CAMERA-2FLOOR")) {//################################################
+    if (client.connect("SONOFF-CAMERA-2FLOOR", "username", "password")) {//################################################
       Serial.println("connected");
       // Once connected, publish an announcement...
       //client.publish("outTopic", "hello world");
@@ -180,9 +180,13 @@ void tikTok(){
     }
   }
   
-  if(h == 6 & m == 0){
-    delay(60000);
-    ESP.restart();
+  if(h == 6 && m == 0){
+    Serial.println("OFF");
+    updateIO(0);
+  }
+  if(h == 6 && m == 1){
+    Serial.println("ON");
+    updateIO(1);
   }
 
   if(h == 12 && m == 0){
