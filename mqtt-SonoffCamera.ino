@@ -18,10 +18,15 @@ unsigned int s;
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
+//################################################
 const char* ssid = "...";
 const char* password = "...";
 const char* mqtt_server = "...";
-const char* myTopic = "Camera/2Floor";//################################################
+const char* mqtt_user = "...";
+const char* mqtt_pass = "...";
+const char* myThing = "SONOFF-CAMERA-2Floor";//TANK/TV
+const char* myTopic = "Camera/2Floor";//TANK/TV
+//################################################
 
 #define LEDPIN 13
 #define RELAYPIN 12
@@ -140,7 +145,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("SONOFF-CAMERA-2FLOOR", "username", "password")) {//################################################
+    if (client.connect(myThing, mqtt_user, mqtt_pass)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
       //client.publish("outTopic", "hello world");
