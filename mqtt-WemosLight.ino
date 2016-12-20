@@ -6,7 +6,6 @@ struct tm* p_tm;
 
 #include "Timer.h"
 Timer t;
-int inputEvent;
 int timeEvent;
 int mqttEvent;
 
@@ -14,7 +13,7 @@ int updateInterval = 5000;//millisec.
 unsigned int h;
 unsigned int m;
 unsigned int s;
-int offTimeH = 6;
+int offTimeH = 1;
 int offTimeM = 30;
 int onTimeH = 18;
 int onTimeM = 0;
@@ -22,14 +21,18 @@ int onTimeM = 0;
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
+//################################################
 const char* ssid = "...";
 const char* password = "...";
 const char* mqtt_server = "...";
-const char* myTopic = "Light/Door";//################################################
+const char* mqtt_user = "...";
+const char* mqtt_pass = "...";
+const char* myThing = "WEMOS-LIGHT-LIVING";
+const char* myTopic = "Light/Living";
+//################################################
 
-#define LEDPIN 13
-#define RELAYPIN 12
-#define BUTTONPIN 0     // the number of the pushbutton pin
+#define LEDPIN LED_BUILTIN
+#define RELAYPIN D1
 int state = 1;
 //int workingMode = 1; // 1 = Auto, 0 = Manual
 
@@ -66,8 +69,6 @@ void setup() {
   Serial.begin(115200);
   updateIO(1);
 
-  inputEvent = t.every(1000, readInput);
-  
   setup_wifi();
 
   client.setServer(mqtt_server, 1883);
@@ -144,7 +145,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("SONOFF-LIGHT-DOOR", "username", "password")) {//################################################
+    if (client.connect(myThing, mqtt_user, mqtt_pass)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
       //client.publish("outTopic", "hello world");
@@ -216,26 +217,4 @@ void printTimeNow(){
   }
   Serial.print(s); // print the second
   Serial.print(" >> "); // print the second
-}
-
-void readInput()
-{
-  // read the state of the pushbutton value:
-  int buttonState = digitalRead(BUTTONPIN);
-
-  // check if the pushbutton is pressed.
-  // if it is, the buttonState is HIGH:
-  if (buttonState == LOW) {
-    state = (state == 0) ? 1 : 0;
-    printTimeNow();
-    if(state == 0){
-      Serial.print("Button : 0");
-      updateIO(0);
-      client.publish(myTopic, "0");
-    } else {
-      Serial.print("Button : 1");
-      updateIO(1);
-      client.publish(myTopic, "1");
-    }
-  }
 }
