@@ -99,6 +99,7 @@ void setup() {
   Serial.println("Now");
   blinking(5);
   updateIO(1);
+  client.publish(myTopic, "1");
 }
 
 void setup_wifi() {
@@ -190,12 +191,6 @@ void tikTok(){
     }
   }
 
-/*
-  if(h == 6 & m == 0){
-    delay(60000);
-    ESP.restart();
-  }
-*/
   if(h == offTimeH && m == offTimeM){
     printTimeNow();
     Serial.println("Auto : OFF");
@@ -209,7 +204,6 @@ void tikTok(){
     updateIO(1);
     client.publish(myTopic, "1");
   }
-
 }
 
 void printTimeNow(){
@@ -235,8 +229,6 @@ void readInput()
   // read the state of the pushbutton value:
   int buttonState = digitalRead(BUTTONPIN);
 
-  // check if the pushbutton is pressed.
-  // if it is, the buttonState is HIGH:
   if (buttonState == LOW) {
     state = (state == 0) ? 1 : 0;
     printTimeNow();
