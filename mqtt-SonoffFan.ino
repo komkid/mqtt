@@ -95,6 +95,7 @@ void setup() {
   Serial.println("Now");
   blinking(5);
   updateIO(1);
+  client.publish(myTopic, "1");
 }
 
 void setup_wifi() {
@@ -142,11 +143,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(strPayload == "1"){
       Serial.print("Manual : ON");
       updateIO(1);
-      //client.publish(myTopic, "1");
     } else {
       Serial.print("Manual : OFF");
       updateIO(0);
-      //client.publish(myTopic, "0");
     }
   } 
 }
@@ -201,9 +200,11 @@ void tikTok(){
       if(h%2 != 0 && m == 0){
         Serial.println("AUTO : ON");
         updateIO(1);
+        client.publish(myTopic, "1");
       } else {
         Serial.println("AUTO : OFF");
         updateIO(0);
+        client.publish(myTopic, "0");
       }
     }
   }
@@ -211,7 +212,7 @@ void tikTok(){
   if(h == 0 && m == 0){
     Serial.println("OFF");
     updateIO(0);
-    //client.publish(myTopic, "0");
+    client.publish(myTopic, "0");
   }
 }
 
