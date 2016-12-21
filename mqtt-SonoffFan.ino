@@ -98,7 +98,7 @@ void setup() {
   updateIO(1);
   if (client.connect(myThing, mqtt_user, mqtt_pass)) {
     client.publish(myTopic, "1");
-    //client.subscribe("Auto/Manual");
+    client.subscribe("Fan/Mode");
     client.subscribe(myTopic);
   }
 }
@@ -157,7 +157,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 boolean reconnect() {
   if (client.connect(myThing, mqtt_user, mqtt_pass)) {
-    //client.subscribe("Auto/Manual");
+    client.subscribe("Fan/Mode");
     client.subscribe(myTopic);
   }
   return client.connected();
