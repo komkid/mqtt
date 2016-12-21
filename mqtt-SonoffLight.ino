@@ -20,9 +20,9 @@ int onTimeH = 18;
 int onTimeM = 0;
 
 #include <PubSubClient.h>
+long lastReconnectAttempt = 0;
 
 // Update these with values suitable for your network.
-//################################################
 //################################################
 const char* ssid = "...";
 const char* password = "...";
@@ -32,7 +32,6 @@ const char* mqtt_pass = "...";
 const char* myThing = "SONOFF-LIGHT-DOOR";
 const char* myTopic = "Light/Door";
 //################################################
-
 #define LEDPIN 13
 #define RELAYPIN 12
 #define BUTTONPIN 0     // the number of the pushbutton pin
@@ -98,8 +97,13 @@ void setup() {
   printTimeNow();
   Serial.println("Now");
   blinking(5);
+
   updateIO(1);
-  client.publish(myTopic, "1");
+  if (client.connect(myThing, mqtt_user, mqtt_pass)) {
+    client.publish(myTopic, "1");
+    //client.subscribe("Auto/Manual");
+    client.subscribe(myTopic);
+  }
 }
 
 void setup_wifi() {
@@ -146,33 +150,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
   } 
 }
 
-void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    if (client.connect(myThing, mqtt_user, mqtt_pass)) {
-      Serial.println("connected");
-      // Once connected, publish an announcement...
-      //client.publish("outTopic", "hello world");
-      // ... and resubscribe
-      //client.subscribe("Auto/Manual");
-      client.subscribe(myTopic);
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
+boolean reconnect() {
+  if (client.connect(myThing, mqtt_user, mqtt_pass)) {
+    //client.subscribe("Auto/Manual");
+    client.subscribe(myTopic);
   }
+  return client.connected();
 }
 
 void mqtt_job(){
   if (!client.connected()) {
-    reconnect();
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    // Client connected
+    client.loop();
   }
-  client.loop();
 }
 
 void loop() {
@@ -193,14 +192,14 @@ void tikTok(){
 
   if(h == offTimeH && m == offTimeM){
     printTimeNow();
-    Serial.print("Auto : OFF");
+    Serial.println("Auto : OFF");
     updateIO(0);
     client.publish(myTopic, "0");
   }
 
   if(h == onTimeH && m == onTimeM){
     printTimeNow();
-    Serial.print("Auto : ON");
+    Serial.println("Auto : ON");
     updateIO(1);
     client.publish(myTopic, "1");
   }
@@ -208,6 +207,8 @@ void tikTok(){
 
 void printTimeNow(){
   Serial.println();
+  Serial.print(WiFi.localIP());
+  Serial.print(" >> ");
   Serial.print(h); // print the hour (86400 equals secs per day)
   Serial.print(':');
   if ( m < 10 ) {
