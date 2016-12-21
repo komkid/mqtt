@@ -94,6 +94,7 @@ void setup() {
   Serial.println("Now");
   blinking(5);
   updateIO(1);
+  client.publish(myTopic, "1");
 }
 
 void setup_wifi() {
@@ -192,6 +193,7 @@ void tikTok(){
   if(h == 6 && m == 1){
     Serial.println("ON");
     updateIO(1);
+    client.publish(myTopic, "1");
   }
 
   if(h == 12 && m == 0){
@@ -201,6 +203,7 @@ void tikTok(){
   if(h == 12 && m == 1){
     Serial.println("ON");
     updateIO(1);
+    client.publish(myTopic, "1");
   }
 
   if(h == 18 && m == 0){
@@ -210,12 +213,13 @@ void tikTok(){
   if(h == 18 && m == 1){
     Serial.println("ON");
     updateIO(1);
+    client.publish(myTopic, "1");
   }
 
   if(h == 0 && m == 0){
     Serial.println("OFF");
     updateIO(0);
-    //client.publish(myTopic, "0");
+    client.publish(myTopic, "0");
   }
 }
 
@@ -242,8 +246,6 @@ void readInput()
   // read the state of the pushbutton value:
   int buttonState = digitalRead(BUTTONPIN);
 
-  // check if the pushbutton is pressed.
-  // if it is, the buttonState is HIGH:
   if (buttonState == LOW) {
     state = (state == 0) ? 1 : 0;
     printTimeNow();
