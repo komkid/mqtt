@@ -132,10 +132,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if(strTopic == myTopic) { 
     if(strPayload == "1"){
-      Serial.print("Manual : ON");
+      Serial.print("MQTT : ON");
       updateIO(1);
     } else {
-      Serial.print("Manual : OFF");
+      Serial.print("MQTT : OFF");
       updateIO(0);
     }
   } 
@@ -187,37 +187,38 @@ void tikTok(){
   }
   
   if(h == 6 && m == 0){
-    Serial.println("OFF");
     updateIO(0);
   }
-  if(h == 6 && m == 1){
-    Serial.println("ON");
+  if(h == 6 && m == 2){
+    printTimeNow();
+    Serial.print("TIMER : OFF/ON");
     updateIO(1);
     client.publish(myTopic, "1");
   }
 
   if(h == 12 && m == 0){
-    Serial.println("OFF");
     updateIO(0);
   }
-  if(h == 12 && m == 1){
-    Serial.println("ON");
+  if(h == 12 && m == 2){
+    printTimeNow();
+    Serial.print("TIMER : OFF/ON");
     updateIO(1);
     client.publish(myTopic, "1");
   }
 
   if(h == 18 && m == 0){
-    Serial.println("OFF");
     updateIO(0);
   }
-  if(h == 18 && m == 1){
-    Serial.println("ON");
+  if(h == 18 && m == 2){
+    printTimeNow();
+    Serial.print("TIMER : OFF/ON");
     updateIO(1);
     client.publish(myTopic, "1");
   }
 
   if(h == 0 && m == 0){
-    Serial.println("OFF");
+    printTimeNow();
+    Serial.print("TIMER : OFF");
     updateIO(0);
     client.publish(myTopic, "0");
   }
