@@ -103,6 +103,7 @@ void setup() {
   Serial.println("Now");
   blinking(5);
   updateIO(1);
+  client.publish(myTopic, "1");
 
   dht.begin();
 }
@@ -213,12 +214,14 @@ void tikTok(){
     printTimeNow();
     Serial.println("Timer : OFF");
     updateIO(0);
+    client.publish(myTopic, "0");
   }
 
   if(temp < 28){
     //printTimeNow();
     Serial.println("Temp. : OFF");
     updateIO(0);
+    client.publish(myTopic, "0");
   }
 }
 
