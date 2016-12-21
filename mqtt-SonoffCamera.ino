@@ -215,7 +215,7 @@ void tikTok(){
   if(h == 0 && m == 0){
     Serial.println("OFF");
     updateIO(0);
-    client.publish(myTopic, "0");
+    //client.publish(myTopic, "0");
   }
 }
 
