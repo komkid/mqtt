@@ -10,7 +10,7 @@ int inputEvent;
 int timeEvent;
 int mqttEvent;
 
-int updateInterval = 60000;//millisec.
+int updateInterval = 50000;//millisec.
 unsigned int h;
 unsigned int m;
 unsigned int s;
