@@ -143,10 +143,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if(strTopic == myTopic) { 
     if(strPayload == "1"){
-      Serial.print("Manual : ON");
+      Serial.print("MQTT : ON");
       updateIO(1);
     } else {
-      Serial.print("Manual : OFF");
+      Serial.print("MQTT : OFF");
       updateIO(0);
     }
   } 
@@ -212,14 +212,14 @@ void tikTok(){
 
   if(h == offTimeH && m == offTimeM){
     printTimeNow();
-    Serial.println("Timer : OFF");
+    Serial.print("Timer : OFF");
     updateIO(0);
     client.publish(myTopic, "0");
   }
 
   if(temp < 28){
-    //printTimeNow();
-    Serial.println("Temp. : OFF");
+    printTimeNow();
+    Serial.print("Temp. : OFF");
     updateIO(0);
     client.publish(myTopic, "0");
   }
