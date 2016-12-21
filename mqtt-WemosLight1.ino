@@ -94,6 +94,7 @@ void setup() {
   Serial.println("Now");
   blinking(5);
   updateIO(1);
+  client.publish(myTopic, "1");
 }
 
 void setup_wifi() {
